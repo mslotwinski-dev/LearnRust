@@ -27,21 +27,34 @@ fn main() {
 }
 
 fn caesar_char(c: char, shift: u8) -> char {
+    const LOWERCASE: &str = "aąbcćdeęfghijklłmnńoópqrśstuvwxyzźż";
+    const UPPERCASE: &str = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRŚSTUVWXYZŹŻ";
+    const DIGITS: &str = "0123456789";
+
     if c.is_ascii_uppercase() {
-        let base = b'A';
-        let pos = c as u8 - base;
-        let new_pos = (pos + shift) % 26;
-        (base + new_pos) as char
+        let chars = UPPERCASE.chars().collect::<Vec<_>>();
+        if let Some(index) = chars.iter().position(|&x| x == c) {
+            let new_index = (index as u8 + shift) % chars.len() as u8;
+            chars[new_index as usize]
+        } else {
+            c
+        }
     } else if c.is_ascii_lowercase() {
-        let base = b'a';
-        let pos = c as u8 - base;
-        let new_pos = (pos + shift) % 26;
-        (base + new_pos) as char
+        let chars = LOWERCASE.chars().collect::<Vec<_>>();
+        if let Some(index) = chars.iter().position(|&x| x == c) {
+            let new_index = (index as u8 + shift) % chars.len() as u8;
+            chars[new_index as usize]
+        } else {
+            c
+        }
     } else if c.is_ascii_digit() {
-        let base = b'0';
-        let pos = c as u8 - base;
-        let new_pos = (pos + shift) % 10;
-        (base + new_pos) as char
+        let chars = DIGITS.chars().collect::<Vec<_>>();
+        if let Some(index) = chars.iter().position(|&x| x == c) {
+            let new_index = (index as u8 + shift) % chars.len() as u8;
+            chars[new_index as usize]
+        } else {
+            c
+        }
     } else {
         c
     }
