@@ -24,6 +24,7 @@ fn main() {
         println!("1. Logowanie lub rejestracja");
         println!("2. Przypomnienie hasła");
         println!("3. Kontakt");
+        println!("4. Wyjście");
 
         let choice = get_user_input();
 
@@ -40,6 +41,12 @@ fn main() {
             }
             "3" => {
                 bank.contact_support();
+            }
+            "4" => {
+                println!("Dziękujemy za skorzystanie z naszego banku!");
+                bank.save_json();
+
+                break;
             }
             _ => {
                 println!("Nieznana opcja.");

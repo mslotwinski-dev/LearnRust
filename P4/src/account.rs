@@ -1,13 +1,29 @@
+use serde::{Deserialize, Serialize};
+
 use rand::Rng;
 
 use crate::user::User;
 
+#[derive(Serialize, Deserialize)]
 pub struct Account {
     id: u32,
     user: User,
     username: String,
     password: String,
     money: f64,
+    logs: Vec<Log>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Log {
+    action: String,
+    amount: f64,
+}
+
+impl Log {
+    pub fn new(action: String, amount: f64) -> Self {
+        Log { action, amount }
+    }
 }
 
 impl Account {
@@ -133,6 +149,7 @@ impl Account {
         let amount: f64 = amount.trim().parse().unwrap();
         self.money += amount;
         println!("Wpłacono: {}", amount);
+        self.logs.push(Log::new("Wpłata".to_string(), amount));
     }
 
     fn withdraw(&mut self) {
@@ -146,6 +163,7 @@ impl Account {
         }
         self.money -= amount;
         println!("Wypłacono: {}", amount);
+        self.logs.push(Log::new("Wypłata".to_string(), -amount));
     }
 
     pub fn transfer(&mut self) {
@@ -161,8 +179,8 @@ impl Account {
             std::io::stdin().read_line(&mut choice).unwrap();
 
             match choice.trim() {
-                // "1" => self.deposit(),
-                // "2" => self.withdraw(),
+                // "1" => self.transfer_standard(),
+                // "2" => self.blik(),
                 "3" => {
                     break;
                 }
@@ -182,13 +200,24 @@ impl Account {
             std::io::stdin().read_line(&mut choice).unwrap();
 
             match choice.trim() {
-                // "1" => self.history(),
+                "1" => self.history(),
                 "2" => self.user.print_data(),
                 "3" => {
                     break;
                 }
                 _ => println!("Niepoprawny wybór. Spróbuj ponownie."),
             }
+        }
+    }
+
+    fn history(&self) {
+        println!("Historia transakcji:");
+
+        println!("{:<50} {:<10}", "Akcja", "Kwota");
+        println!("{}", "-".repeat(65));
+
+        for log in &self.logs {
+            println!("{:<50} {:<10}", log.action, log.amount);
         }
     }
 
@@ -206,6 +235,7 @@ impl Account {
             username,
             password,
             money: 0.0,
+            logs: Vec::new(),
         }
     }
 }

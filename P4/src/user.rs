@@ -1,8 +1,12 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub enum Gender {
     Male,
     Female,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct User {
     name: String,
     age: u8,

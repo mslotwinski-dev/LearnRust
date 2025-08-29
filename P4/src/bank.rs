@@ -1,13 +1,36 @@
+use serde::{Deserialize, Serialize};
+
+use std::fs;
+use std::path::Path;
+
 use crate::account::Account;
 use crate::user::User;
 use crate::utility::{bank_name, clear};
 
+#[derive(Serialize, Deserialize)]
 pub struct Bank {
     accounts: Vec<Account>,
 }
 
 impl Bank {
     pub fn new() -> Self {
+        let path = "bank_db.json";
+
+        if Path::new(path).exists() {
+            // spróbuj wczytać JSON
+            let data = fs::read_to_string(path).unwrap_or_else(|_| {
+                println!("Nie udało się odczytać pliku. Tworzę pusty bank.");
+                String::new()
+            });
+
+            if !data.is_empty()
+                && let Ok(bank) = serde_json::from_str::<Bank>(&data)
+            {
+                println!("Dane banku wczytane z pliku.");
+                return bank;
+            }
+        }
+
         Bank {
             accounts: Vec::new(),
         }
@@ -137,5 +160,10 @@ impl Bank {
         println!("Rejestracja zakończona sukcesem! Teraz możesz się zalogować!");
 
         return account.get_username();
+    }
+
+    pub fn save_json(&self) {
+        let json = serde_json::to_string_pretty(&self).unwrap();
+        std::fs::write("bank_db.json", json).expect("Nie udało się zapisać danych banku do pliku.");
     }
 }
