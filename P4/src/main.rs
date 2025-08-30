@@ -30,14 +30,12 @@ fn main() {
 
         match choice.as_str() {
             "1" => {
-                if let Some(account) = bank.login() {
-                    account.start_session();
-                } else {
+                if !bank.login() {
                     println!("Logowanie nieudane.");
                 }
             }
             "2" => {
-                // bank.reset_password();
+                bank.reset_password();
             }
             "3" => {
                 bank.contact_support();

@@ -31,6 +31,30 @@ impl Account {
         self.username.clone()
     }
 
+    pub fn get_email(&self) -> &str {
+        self.user.get_email()
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.id
+    }
+
+    pub fn get_cash(&self) -> f64 {
+        self.money
+    }
+
+    pub fn add_cash(&mut self, amount: f64) {
+        self.money += amount;
+    }
+
+    pub fn get_password(&self) -> &str {
+        &self.password
+    }
+
+    pub fn push_log(&mut self, action: String, amount: f64) {
+        self.logs.push(Log::new(action, amount));
+    }
+
     fn input_username() -> String {
         let mut username = String::new();
 
@@ -93,32 +117,6 @@ impl Account {
         self.password == password
     }
 
-    pub fn start_session(&mut self) {
-        println!();
-        println!("Witaj ponownie, {}! ({})", self.username, self.id);
-        loop {
-            println!("Wybierz opcję:");
-            println!("1. Pieniądze");
-            println!("2. Przelewy");
-            println!("3. Dane");
-            println!("4. Wyloguj się");
-
-            let mut choice = String::new();
-            std::io::stdin().read_line(&mut choice).unwrap();
-
-            match choice.trim() {
-                "1" => self.balance(),
-                "2" => self.transfer(),
-                "3" => self.data(),
-                "4" => {
-                    println!("Wylogowano pomyślnie!");
-                    break;
-                }
-                _ => println!("Niepoprawny wybór. Spróbuj ponownie."),
-            }
-        }
-    }
-
     pub fn balance(&mut self) {
         println!("Twoje saldo wynosi: {}", self.money);
 
@@ -149,7 +147,7 @@ impl Account {
         let amount: f64 = amount.trim().parse().unwrap();
         self.money += amount;
         println!("Wpłacono: {}", amount);
-        self.logs.push(Log::new("Wpłata".to_string(), amount));
+        self.push_log("Wpłata".to_string(), amount);
     }
 
     fn withdraw(&mut self) {
@@ -163,33 +161,10 @@ impl Account {
         }
         self.money -= amount;
         println!("Wypłacono: {}", amount);
-        self.logs.push(Log::new("Wypłata".to_string(), -amount));
+        self.push_log("Wypłata".to_string(), -amount);
     }
 
-    pub fn transfer(&mut self) {
-        println!("Twoje saldo wynosi: {}", self.money);
-
-        loop {
-            println!("Wybierz opcję:");
-            println!("1. Przelew zwykły");
-            println!("2. Przelew na numer telefonu (BLIK)");
-            println!("3. Powrót do menu głównego");
-
-            let mut choice = String::new();
-            std::io::stdin().read_line(&mut choice).unwrap();
-
-            match choice.trim() {
-                // "1" => self.transfer_standard(),
-                // "2" => self.blik(),
-                "3" => {
-                    break;
-                }
-                _ => println!("Niepoprawny wybór. Spróbuj ponownie."),
-            }
-        }
-    }
-
-    pub fn data(&self) {
+    pub fn data(&mut self) {
         loop {
             println!("Wybierz opcję:");
             println!("1. Historia przelewów");
@@ -210,7 +185,7 @@ impl Account {
         }
     }
 
-    fn history(&self) {
+    fn history(&mut self) {
         println!("Historia transakcji:");
 
         println!("{:<50} {:<10}", "Akcja", "Kwota");

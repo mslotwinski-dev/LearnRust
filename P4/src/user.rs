@@ -19,10 +19,14 @@ impl User {
         &self.name
     }
 
+    pub fn get_email(&self) -> &str {
+        &self.email
+    }
+
     pub fn print_data(&self) {
         println!("Imię i nazwisko: {}", self.get_name());
         println!("Wiek: {}", self.age);
-        println!("E-mail: {}", self.email);
+        println!("E-mail: {}", self.get_email());
         println!(
             "Płeć: {}",
             match self.gender {
