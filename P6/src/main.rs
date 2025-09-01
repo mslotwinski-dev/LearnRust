@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+#[derive(Debug)]
 struct Client {
     id: u32,
     arrival_time: u64,
