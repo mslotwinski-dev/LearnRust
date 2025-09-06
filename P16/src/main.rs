@@ -2,7 +2,8 @@ mod entity;
 mod world;
 
 use crate::world::World;
-use eframe::{egui, epi};
+use eframe::egui;
+use egui_plot::{Line, Plot, PlotPoints};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
@@ -15,12 +16,8 @@ struct App {
     corpses: Arc<Mutex<Vec<usize>>>,
 }
 
-impl epi::App for App {
-    fn name(&self) -> &str {
-        "Symulacja ekosystemu"
-    }
-
-    fn update(&mut self, ctx: &egui::Context, _: &epi::Frame) {
+impl eframe::App for App {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             let plots = [
                 ("Deers", &self.deers, egui::Color32::RED),
@@ -30,24 +27,38 @@ impl epi::App for App {
                 ("Corpses", &self.corpses, egui::Color32::LIGHT_GRAY),
             ];
 
-            for (label, data, color) in plots {
-                let data = data.lock().unwrap();
-                let points: Vec<[f64; 2]> = data
-                    .iter()
-                    .enumerate()
-                    .map(|(x, y)| [x as f64, *y as f64])
-                    .collect();
+            let columns = 3; // 3 kolumny
+            let mut col_index = 0;
 
-                ui.label(label);
-                egui::plot::Plot::new(label)
-                    .view_aspect(2.0)
-                    .show(ui, |plot_ui| {
-                        plot_ui.line(
-                            egui::plot::Line::new(egui::plot::PlotPoints::from(points))
-                                .color(color),
-                        );
+            ui.horizontal_wrapped(|ui| {
+                for (label, data, color) in plots {
+                    let data = data.lock().unwrap();
+                    let points: Vec<[f64; 2]> = data
+                        .iter()
+                        .enumerate()
+                        .map(|(x, y)| [x as f64, *y as f64])
+                        .collect();
+
+                    ui.vertical(|ui| {
+                        ui.label(label);
+                        Plot::new(label)
+                            .view_aspect(1.0)
+                            .width(550.0)
+                            .height(400.0)
+                            .show(ui, |plot_ui| {
+                                plot_ui.line(
+                                    Line::new(label.to_string(), PlotPoints::from(points))
+                                        .color(color),
+                                );
+                            });
                     });
-            }
+
+                    col_index += 1;
+                    if col_index % columns == 0 {
+                        ui.end_row(); // przejście do nowego wiersza
+                    }
+                }
+            });
         });
 
         ctx.request_repaint();
@@ -95,5 +106,10 @@ fn main() {
     };
 
     let native_options = eframe::NativeOptions::default();
-    eframe::run_native(Box::new(app), native_options);
+    eframe::run_native(
+        "Symulacja ekosystemu",
+        native_options,
+        Box::new(|_cc| Ok(Box::new(app))),
+    )
+    .unwrap();
 }

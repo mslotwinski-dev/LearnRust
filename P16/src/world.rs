@@ -1,7 +1,7 @@
 use crate::entity::{Entity, EntityType};
 
-pub const WIDTH: f32 = 5000.0;
-pub const HEIGHT: f32 = 5000.0;
+pub const WIDTH: f32 = 3000.0;
+pub const HEIGHT: f32 = 3000.0;
 
 pub struct World {
     entities: Vec<Entity>,
@@ -11,20 +11,20 @@ impl World {
     pub fn new() -> Self {
         let mut entities = Vec::new();
 
-        for _ in 0..5000 {
+        for _ in 0..3000 {
             entities.push(Entity::oak());
         }
 
-        for _ in 0..200 {
+        for _ in 0..70 {
             entities.push(Entity::deer());
         }
         for _ in 0..10 {
             entities.push(Entity::wolf());
         }
-        for _ in 0..30 {
+        for _ in 0..5 {
             entities.push(Entity::raven());
         }
-        for _ in 0..25 {
+        for _ in 0..0 {
             entities.push(Entity::boar());
         }
 

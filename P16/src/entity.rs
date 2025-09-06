@@ -93,10 +93,12 @@ impl Entity {
     // }
 
     fn in_range(&mut self, entity: &Entity) -> bool {
-        ((self.x - entity.x).powi(2) + (self.y - entity.y).powi(2)).sqrt() < 10.0
+        ((self.x - entity.x).powi(2) + (self.y - entity.y).powi(2)).sqrt() < 50.0
     }
 
     pub fn eat(&mut self, entities: &mut [&mut Entity]) {
+        let mut rng = rand::rng();
+
         let _nearby: Vec<&Entity> = entities
             .iter()
             .filter(|e| self.in_range(e))
@@ -123,14 +125,18 @@ impl Entity {
                     .iter_mut()
                     .find(|e| e.entity_type == EntityType::Deer)
                 {
-                    self.kill(target);
+                    if rng.random::<f32>() < 0.1 {
+                        self.kill(target);
+                    }
                 }
             }
             EntityType::Wolf => {
                 if let Some(target) = entities.iter_mut().find(|e| {
                     e.entity_type == EntityType::Deer || e.entity_type == EntityType::Boar
                 }) {
-                    self.kill(target);
+                    if rng.random::<f32>() < 0.2 {
+                        self.kill(target);
+                    }
                 }
             }
             EntityType::Raven => {
@@ -167,19 +173,19 @@ impl Entity {
     }
 
     fn mate(&mut self, partner: &mut Entity) -> bool {
-        if self.energy < 80.0 || partner.energy < 80.0 {
+        if self.energy < 70.0 || partner.energy < 70.0 {
             return false;
         }
 
-        self.energy -= 30.0;
-        partner.energy -= 30.0;
+        self.energy -= 35.0;
+        partner.energy -= 35.0;
 
         true
     }
 
     fn kill(&mut self, prey: &mut Entity) {
         prey.energy -= 100.0;
-        self.energy += 100.0;
+        self.energy += 30.0;
         prey.entity_type = EntityType::Corpse;
         prey.energy = 100.0;
     }
@@ -189,7 +195,7 @@ impl Entity {
             return;
         }
 
-        self.energy -= 10.0;
+        self.energy -= 3.0;
 
         if self.energy < 0.0 && self.entity_type != EntityType::Corpse {
             self.entity_type = EntityType::Corpse;
